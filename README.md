@@ -52,4 +52,4 @@ We welcome contributions from the community! Please fork this repository, create
 
 License
 
-This project is licensed under the MIT License.
+This project is licensed under the BSD License.
