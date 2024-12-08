@@ -41,3 +41,8 @@ The Arduino sketch implements a web-controlled robot car with camera streaming u
 
 (1) The loop() function is called repeatedly as part of the FreeRTOS scheduler.
 (2) Background tasks, like Wi-Fi handling and WebSocket processing, are managed by FreeRTOS.
+
+7. How to build:
+(1) Use Arduino IDE to open Camera_Car folder;
+(2) Include library with Zipped file to select AsyncTCP-master.zip and ESPAsyncWebServer-master.zip.
+(3) Load to ESP32 board with a serical port (usually a USB COM port).
