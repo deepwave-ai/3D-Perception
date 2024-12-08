@@ -113,16 +113,31 @@ To turn the robot in one direction, you need to spin the opposite motor faster. 
 The ESP32-CAM
 
 The ESP32-CAM is based upon the ESP32-S module, so it shares the same specifications.	It has the following features:
-802.11b/g/n Wi-Fi
-Bluetooth 4.2 with BLE
-UART, SPI, I2C and PWM interfaces
-Clock speed up to 160 MHz
-Computing power up to 600 DMIPS
-520 KB SRAM plus 4 MB PSRAM
-Supports WiFi Image Upload
-Multiple Sleep modes
-Firmware Over the Air (FOTA) upgrades possible
-9 GPIO ports,Built-in Flash LED
+
+(1) 802.11b/g/n Wi-Fi
+
+(2) Bluetooth 4.2 with BLE
+
+(3) UART, SPI, I2C and PWM interfaces
+
+(4) Clock speed up to 160 MHz
+
+(5) Computing power up to 600 DMIPS
+
+(6) 520 KB SRAM plus 4 MB PSRAM
+
+(7) Supports WiFi Image Upload
+
+(8) Multiple Sleep modes
+
+(9) Firmware Over the Air (FOTA) upgrades possible
+
+(10) 9 GPIO ports,Built-in Flash LED
 
 ![image](https://github.com/user-attachments/assets/d1d00723-410b-4dbf-8f32-e6e927c25d77)
+
+Camera Sensor (OV2640)
+
+The OV2640 sensor used in ESP32-CAM can output data in various formats, such as JPEG, RGB565, YUV422, etc., but it does not support hardware-accelerated H.264 encoding. The OV2640 can output JPEG-compressed images directly, which are then streamed as a series of frames. This method is lightweight and well-suited to the ESP32's capabilities, but it results in larger files compared to H.264 since MJPEG does not use inter-frame compression.
+
 
