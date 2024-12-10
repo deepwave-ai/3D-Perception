@@ -1,7 +1,7 @@
 # ORB SLAM
 Overview
 
-ORB (Oriented FAST and Rotated BRIEF) can be used for feature detection anf matching. Hence it can also be also used for Visual SLAM (Simultaneous Localization and Mapping).
+ORB (Oriented FAST and Rotated BRIEF) can be used for feature detection and matching. Hence it can also be also used for Visual SLAM (Simultaneous Localization and Mapping).
 
 Implementing Visual SLAM using ORB (Oriented FAST and Rotated BRIEF) in Python is an efficient solution due to its computational efficiency and robustness.
 

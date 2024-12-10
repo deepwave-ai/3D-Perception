@@ -18,19 +18,19 @@ MPC solves an optimization problem over a finite prediction horizon at each cont
 
 (2) Receding Horizon Principle
 
-2.a Only the first control input is applied.
+    Only the first control input is applied.
 
-2.b At the next step, the optimization is re-solved with updated states.
+    At the next step, the optimization is re-solved with updated states.
 
 (3) Weighting Matrices
 
 Q,R,P tune the balance between state errors and control effort:
 
-High Q: Prioritize state accuracy.
+    High Q: Prioritize state accuracy.
 
-High  R: Penalize large control inputs.
+    High  R: Penalize large control inputs.
 
-Terminal weight P: Improves stability.
+    Terminal weight P: Improves stability.
 
 (4) Stability
 
@@ -46,9 +46,9 @@ At each time step, MPC solves an optimization problem, typically quadratic (line
 
 2.b Efficient Solvers
 
-Linear Systems: Quadratic Programming (QP) solvers (e.g., OSQP, qpOASES).
+    Linear Systems: Quadratic Programming (QP) solvers (e.g., OSQP, qpOASES).
 
-Nonlinear Systems: Nonlinear Programming (NLP) solvers (e.g., CasADi, IPOPT).
+    Nonlinear Systems: Nonlinear Programming (NLP) solvers (e.g., CasADi, IPOPT).
 
 2.c Real-Time Feasibility
 
@@ -62,31 +62,31 @@ Advanced MPC implementations exploit:
 
 3. Applications
 
-Process Control: Chemical plants, refineries.
+    Process Control: Chemical plants, refineries.
 
-Autonomous Vehicles: Path following, collision avoidance.
+    Autonomous Vehicles: Path following, collision avoidance.
 
-Robotics: Arm motion planning, balancing.
+    Robotics: Arm motion planning, balancing.
 
-Energy Systems: Optimal power flow, demand response.
+    Energy Systems: Optimal power flow, demand response.
 
 4. Strengths and Weaknesses
 
 4.a Strengths
 
-Handles multivariable systems and constraints effectively.
+    Handles multivariable systems and constraints effectively.
 
-Predictive nature allows for anticipatory control.
+    Predictive nature allows for anticipatory control.
 
-Flexible for linear and nonlinear systems.
+    Flexible for linear and nonlinear systems.
 
 4.b Weaknesses
 
-Computationally expensive, especially for long horizons or complex dynamics.
+    Computationally expensive, especially for long horizons or complex dynamics.
 
-Requires accurate system models and real-time solvers.
+    Requires accurate system models and real-time solvers.
 
-May be sensitive to model inaccuracies.
+    May be sensitive to model inaccuracies.
 
 5. Demo
 
@@ -107,3 +107,5 @@ Input (u) constraints and optional state constraints.
 5.d Results:
 
 Plots the trajectory of the system states and the control inputs applied over time.
+
+![mpc](https://github.com/user-attachments/assets/94e6ec34-f20a-4ad4-9b40-a876fa952a43)
