@@ -1,7 +1,7 @@
 # 3D-Perception
 Overview
 
-This project leverages cutting-edge technologies to enable robust 3D perception using a combination of LiDAR, Radar, and advanced frameworks like Apple ARKit and Google ARCore. By integrating multiple sensing modalities and software ecosystems, the system delivers precise spatial awareness and object detection for applications in robotics, autonomous vehicles, augmented reality, and more.
+This project leverages cutting-edge technologies to enable robust 3D perception using a combination of LiDAR, Radar, and advanced frameworks like Apple ARKit and Google ARCore. By integrating multiple sensing modalities and software ecosystems, the system delivers precise spatial awareness and object detection for applications in robotics, autonomous vehicles, biometric authentication, augmented reality, and more.
 
 Features
 
