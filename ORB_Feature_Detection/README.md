@@ -1,4 +1,4 @@
-# ORB SLAM
+# ORB Feature Detection
 Overview
 
 ORB (Oriented FAST and Rotated BRIEF) can be used for feature detection anf matching. Hence it can also be also used for Visual SLAM (Simultaneous Localization and Mapping).
