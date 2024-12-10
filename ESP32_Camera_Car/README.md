@@ -5,8 +5,6 @@ Hardware is based on LAFVIN Robot Starter Kit Project with ESP32 Module and Code
 
 https://www.amazon.com/dp/B0CYT8LLDL?ref=ppx_yo2ov_dt_b_fed_asin_title
 
-Software is cloned from https://github.com/un0038998/CameraCar. 
-
 The Arduino sketch implements a web-controlled robot car with camera streaming using the ESP32. Here's a breakdown of the components:
 
 1. Includes and Setup:
