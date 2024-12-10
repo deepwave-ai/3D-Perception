@@ -108,3 +108,4 @@ Input (u) constraints and optional state constraints.
 
 Plots the trajectory of the system states and the control inputs applied over time.
 
+![mpc](https://github.com/user-attachments/assets/94e6ec34-f20a-4ad4-9b40-a876fa952a43)
