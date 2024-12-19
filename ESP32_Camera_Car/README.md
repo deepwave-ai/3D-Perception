@@ -1,7 +1,9 @@
 
-ESP32 Camera Car
+ESP32 Camera Car and Android App Control
 
-Hardware is based on LAFVIN Robot Starter Kit Project with ESP32 Module and Code Learning Develop Skill Full Version Smart Car Kit Compatible with Arduino IDE.
+The camera car hardware is based on LAFVIN Robot Starter Kit Project with ESP32 Module and Code Learning Develop Skill Full Version Smart Car Kit Compatible with Arduino IDE.
+
+Android app is for controlling the car movement.
 
 https://www.amazon.com/dp/B0CYT8LLDL?ref=ppx_yo2ov_dt_b_fed_asin_title
 
