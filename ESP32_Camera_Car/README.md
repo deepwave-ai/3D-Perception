@@ -5,8 +5,6 @@ The camera car hardware is based on LAFVIN Robot Starter Kit Project with ESP32 
 
 Android app is for controlling the car movement.
 
-https://www.amazon.com/dp/B0CYT8LLDL?ref=ppx_yo2ov_dt_b_fed_asin_title
-
 The Arduino sketch implements a web-controlled robot car with camera streaming using the ESP32. Here's a breakdown of the components:
 
 1. Includes and Setup:
