@@ -5,6 +5,10 @@
 #include <ESPAsyncWebServer.h>
 #include <iostream>
 #include <sstream>
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <vector> // Include for std::vector
 
 struct MOTOR_PINS
 {
@@ -56,12 +60,24 @@ const int PWMLightChannel = 3;
 #define PCLK_GPIO_NUM     22
 
 const char* ssid     = "ESP32Car";
-const char* password = "12345678";
+const char* password = "";
+
+#define SERVICE_UUID "12345678-1234-5678-1234-56789abcdef0"        // BLE Service UUID
+#define SSID_CHARACTERISTIC_UUID "abcdef01-1234-5678-1234-56789abcdef0" // SSID Characteristic UUID
+#define PASSWORD_CHARACTERISTIC_UUID "abcdef02-1234-5678-1234-56789abcdef0" // Password Characteristic UUID
+#define ACK_CHARACTERISTIC_UUID "abcdef03-1234-5678-1234-56789abcdef0"
+
+BLEServer *pServer = nullptr;
+BLECharacteristic *ackCharacteristic;
+BLEService *pService;
+BLEAdvertising *pAdvertising;
+std::vector<BLECharacteristic *> characteristics; // Global list of characteristics
 
 AsyncWebServer server(80);
 AsyncWebSocket wsCamera("/Camera");
 AsyncWebSocket wsCarInput("/CarInput");
 uint32_t cameraClientId = 0;
+
 
 const char* htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
 <!DOCTYPE html>
@@ -475,29 +491,129 @@ void setUpPinModes()
   ledcAttachPin(LIGHT_PIN, PWMLightChannel);
 }
 
+void stopBLE() {
+    // Disconnect all connected clients
+    if (pServer) {
+        pServer->disconnect(0); // Disconnect all clients
+        Serial.println("All BLE clients disconnected");
+    } else {
+        Serial.println("BLE server is not initialized");
+    }
+
+    // Stop BLE advertising
+    if (pAdvertising) {
+        pAdvertising->stop();
+        Serial.println("BLE advertising stopped");
+    } else {
+        Serial.println("BLE advertising already stopped or null");
+    }
+
+    // Stop BLE service
+    if (pService) {
+        pService->stop();
+        Serial.println("BLE service stopped");
+    } else {
+        Serial.println("BLE service is null or already stopped");
+    }
+}
+
+void disableBLE() {
+    if (BLEDevice::getInitialized()) {
+        BLEDevice::deinit(); // Fully deinitialize BLE stack
+        Serial.println("BLE stack disabled");
+    } else {
+        Serial.println("BLE stack already disabled");
+    }
+}
+
+void stopAndDisableBLE() {
+    Serial.println("Stopping BLE...");
+    stopBLE();
+    delay(100); // Allow operations to settle
+    Serial.println("Disabling BLE stack...");
+    disableBLE();
+    Serial.println("BLE fully stopped and disabled.");
+}
+
+class CustomCallback : public BLECharacteristicCallbacks {
+    void onWrite(BLECharacteristic *characteristic) override {
+        std::string value = characteristic->getValue();
+        Serial.printf("Received value: %s\n", value.c_str());
+        if (value == "ACK") {
+            stopAndDisableBLE();
+
+            delay(100);
+
+            WiFi.softAP(ssid, password);
+            Serial.println("\nWiFi AP started");
+            IPAddress IP = WiFi.softAPIP();
+            Serial.print("AP IP address: ");
+            Serial.println(IP);
+
+            // Set up the HTTP server
+            server.on("/", HTTP_GET, handleRoot);
+            server.onNotFound(handleNotFound);
+
+            wsCamera.onEvent(onCameraWebSocketEvent);
+            server.addHandler(&wsCamera);
+
+            wsCarInput.onEvent(onCarInputWebSocketEvent);
+            server.addHandler(&wsCarInput);
+
+            server.begin();
+            Serial.println("\nHTTP server started");
+        }
+    }
+};
+
+void setupBLE() {
+    BLEDevice::init("ESP32_Camera_Config");
+    pServer = BLEDevice::createServer();
+    pService = pServer->createService(SERVICE_UUID);
+
+    // Create characteristics
+    BLECharacteristic *pCharacteristicSSID = pService->createCharacteristic(
+        SSID_CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_READ
+    );
+    characteristics.push_back(pCharacteristicSSID);
+
+    BLECharacteristic *pCharacteristicPassword = pService->createCharacteristic(
+        PASSWORD_CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_READ
+    );
+
+    characteristics.push_back(pCharacteristicPassword);
+
+    // Set values
+    pCharacteristicSSID->setValue(ssid);
+    pCharacteristicPassword->setValue(password);
+
+    // Create ACK characteristic
+    ackCharacteristic = pService->createCharacteristic(
+        ACK_CHARACTERISTIC_UUID,
+        BLECharacteristic::PROPERTY_WRITE
+    );
+    characteristics.push_back(ackCharacteristic);
+
+    ackCharacteristic->setCallbacks(new CustomCallback());
+
+    // Start BLE service and advertising
+    pService->start();
+    pAdvertising = BLEDevice::getAdvertising();
+    pAdvertising->addServiceUUID(SERVICE_UUID);
+    pAdvertising->start();
+
+    Serial.println("\nBLE server is running...");
+}
 
 void setup(void) 
 {
   setUpPinModes();
-  Serial.begin(115200);
+  Serial.begin(9600);
 
-  WiFi.softAP(ssid, password);
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
-
-  server.on("/", HTTP_GET, handleRoot);
-  server.onNotFound(handleNotFound);
-      
-  wsCamera.onEvent(onCameraWebSocketEvent);
-  server.addHandler(&wsCamera);
-
-  wsCarInput.onEvent(onCarInputWebSocketEvent);
-  server.addHandler(&wsCarInput);
-
-  server.begin();
-  Serial.println("HTTP server started");
-
+  setupBLE();
+ 
   setupCamera();
 }
 
@@ -507,5 +623,5 @@ void loop()
   wsCamera.cleanupClients(); 
   wsCarInput.cleanupClients(); 
   sendCameraPicture(); 
-  Serial.printf("SPIRam Total heap %d, SPIRam Free Heap %d\n", ESP.getPsramSize(), ESP.getFreePsram());
+  //Serial.printf("SPIRam Total heap %d, SPIRam Free Heap %d\n", ESP.getPsramSize(), ESP.getFreePsram());
 }
