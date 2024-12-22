@@ -55,3 +55,6 @@ Algorithm Workflow:
 The output shows the grid, the obstacle, and the path from start to goal.
 
 ![aStarPlaning](https://github.com/user-attachments/assets/6e848112-af89-460e-bdc1-1eaf44805cc6)
+
+C++ output:
+![aStarPath_cpp](https://github.com/user-attachments/assets/e268bea4-85d1-4ca7-94fe-cecfaccb0b2d)
