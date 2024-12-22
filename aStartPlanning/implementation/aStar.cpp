@@ -1,3 +1,10 @@
+//
+// Copyright(c) 2024 deepwave-ai. All Rights Reserved.
+//
+// aStarPathPlanning.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+//
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -26,11 +33,11 @@ int heuristic(pair<int, int> a, pair<int, int> b) {
 }
 
 vector<pair<int, int>> astar(const vector<vector<int>>& grid, pair<int, int> start, pair<int, int> goal) {
-    vector<pair<int, int>> neighbors = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}; // 4-connected grid
+    vector<pair<int, int>> neighbors = { {0, 1}, {1, 0}, {0, -1}, {-1, 0} }; // 4-connected grid
     priority_queue<Node, vector<Node>, greater<Node>> open_list;
     set<pair<int, int>> closed_set;
 
-    open_list.push({start, 0, heuristic(start, goal), {start}});
+    open_list.push({ start, 0, heuristic(start, goal), {start} });
 
     while (!open_list.empty()) {
         Node current = open_list.top();
@@ -46,27 +53,35 @@ vector<pair<int, int>> astar(const vector<vector<int>>& grid, pair<int, int> sta
             return current.path; // Return path when goal is reached
         }
 
-        for (auto [dx, dy] : neighbors) {
-            pair<int, int> neighbor = {current.position.first + dx, current.position.second + dy};
+        for (const auto& neighbor : neighbors) {
+            int dx = neighbor.first;
+            int dy = neighbor.second;
 
-            if (neighbor.first >= 0 && neighbor.first < grid.size() &&
-                neighbor.second >= 0 && neighbor.second < grid[0].size()) {
-                if (grid[neighbor.first][neighbor.second] == 1 || closed_set.find(neighbor) != closed_set.end()) {
+            int neighbor_x = current.position.first + dx;
+            int neighbor_y = current.position.second + dy;
+
+            // Ensure the neighbor is within grid bounds
+            if (neighbor_x >= 0 && neighbor_x < grid.size() &&
+                neighbor_y >= 0 && neighbor_y < grid[0].size()) {
+
+                // Ensure the neighbor is not an obstacle and hasn't been visited
+                if (grid[neighbor_x][neighbor_y] == 1 || closed_set.find({ neighbor_x, neighbor_y }) != closed_set.end()) {
                     continue;
                 }
 
                 vector<pair<int, int>> new_path = current.path;
-                new_path.push_back(neighbor);
+                new_path.push_back({ neighbor_x, neighbor_y });
                 int g = current.g + 1;
-                int f = g + heuristic(neighbor, goal);
+                int f = g + heuristic({ neighbor_x, neighbor_y }, goal);
 
-                open_list.push({neighbor, g, f, new_path});
+                open_list.push({ {neighbor_x, neighbor_y}, g, f, new_path });
             }
         }
     }
 
     return {}; // Return empty vector if no path is found
 }
+
 
 int main() {
     // Define grid, start, and goal
@@ -75,8 +90,8 @@ int main() {
         grid[i][5] = 1; // Add an obstacle
     }
 
-    pair<int, int> start = {0, 0};
-    pair<int, int> goal = {9, 9};
+    pair<int, int> start = { 0, 0 };
+    pair<int, int> goal = { 9, 9 };
 
     // Run A* and retrieve the path
     vector<pair<int, int>> path = astar(grid, start, goal);
@@ -87,24 +102,30 @@ int main() {
         for (int j = 0; j < grid[0].size(); ++j) {
             if (grid[i][j] == 1) {
                 image.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0); // Black for obstacles
-            } else {
+            }
+            else {
                 image.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 255, 255); // White for free space
             }
         }
     }
 
     if (!path.empty()) {
-        for (const auto& [x, y] : path) {
-            image.at<cv::Vec3b>(x, y) = cv::Vec3b(0, 0, 255); // Red for path
+        std::cout << "Path coordinates:" << std::endl;
+        for (const auto& coordinate : path) {
+            std::cout << "(" << coordinate.first << ", " << coordinate.second << ")" << std::endl;
+
+            int y = coordinate.first;  // Row (y)
+            int x = coordinate.second; // Column (x)
+            if (y >= 0 && y < image.rows && x >= 0 && x < image.cols) {
+                image.at<cv::Vec3b>(y, x) = cv::Vec3b(0, 0, 255); // Red for path
+            }
         }
     }
 
     image.at<cv::Vec3b>(start.first, start.second) = cv::Vec3b(0, 255, 0); // Green for start
-    image.at<cv::Vec3b>(goal.first, goal.second) = cv::Vec3b(255, 0, 0); // Blue for goal
+    image.at<cv::Vec3b>(goal.first, goal.second) = cv::Vec3b(255, 0, 0);   // Blue for goal
 
     cv::resize(image, image, cv::Size(500, 500), 0, 0, cv::INTER_NEAREST);
     cv::imshow("A* Pathfinding", image);
     cv::waitKey(0);
-
-    return 0;
 }
