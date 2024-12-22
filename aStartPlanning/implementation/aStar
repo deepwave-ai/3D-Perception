@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <cmath>
+#include <set>
+#include <utility>
+#include <algorithm>
+#include <opencv2/opencv.hpp>
+
+using namespace std;
+
+struct Node {
+    pair<int, int> position;
+    int g; // Cost from start to current node
+    int f; // Total estimated cost (g + h)
+    vector<pair<int, int>> path;
+
+    bool operator>(const Node& other) const {
+        return f > other.f;
+    }
+};
+
+int heuristic(pair<int, int> a, pair<int, int> b) {
+    // Manhattan distance
+    return abs(a.first - b.first) + abs(a.second - b.second);
+}
+
+vector<pair<int, int>> astar(const vector<vector<int>>& grid, pair<int, int> start, pair<int, int> goal) {
+    vector<pair<int, int>> neighbors = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}; // 4-connected grid
+    priority_queue<Node, vector<Node>, greater<Node>> open_list;
+    set<pair<int, int>> closed_set;
+
+    open_list.push({start, 0, heuristic(start, goal), {start}});
+
+    while (!open_list.empty()) {
+        Node current = open_list.top();
+        open_list.pop();
+
+        if (closed_set.find(current.position) != closed_set.end()) {
+            continue;
+        }
+
+        closed_set.insert(current.position);
+
+        if (current.position == goal) {
+            return current.path; // Return path when goal is reached
+        }
+
+        for (auto [dx, dy] : neighbors) {
+            pair<int, int> neighbor = {current.position.first + dx, current.position.second + dy};
+
+            if (neighbor.first >= 0 && neighbor.first < grid.size() &&
+                neighbor.second >= 0 && neighbor.second < grid[0].size()) {
+                if (grid[neighbor.first][neighbor.second] == 1 || closed_set.find(neighbor) != closed_set.end()) {
+                    continue;
+                }
+
+                vector<pair<int, int>> new_path = current.path;
+                new_path.push_back(neighbor);
+                int g = current.g + 1;
+                int f = g + heuristic(neighbor, goal);
+
+                open_list.push({neighbor, g, f, new_path});
+            }
+        }
+    }
+
+    return {}; // Return empty vector if no path is found
+}
+
+int main() {
+    // Define grid, start, and goal
+    vector<vector<int>> grid(10, vector<int>(10, 0));
+    for (int i = 3; i < 8; ++i) {
+        grid[i][5] = 1; // Add an obstacle
+    }
+
+    pair<int, int> start = {0, 0};
+    pair<int, int> goal = {9, 9};
+
+    // Run A* and retrieve the path
+    vector<pair<int, int>> path = astar(grid, start, goal);
+
+    // Visualization using OpenCV
+    cv::Mat image = cv::Mat::zeros(grid.size(), grid[0].size(), CV_8UC3);
+    for (int i = 0; i < grid.size(); ++i) {
+        for (int j = 0; j < grid[0].size(); ++j) {
+            if (grid[i][j] == 1) {
+                image.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0); // Black for obstacles
+            } else {
+                image.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 255, 255); // White for free space
+            }
+        }
+    }
+
+    if (!path.empty()) {
+        for (const auto& [x, y] : path) {
+            image.at<cv::Vec3b>(x, y) = cv::Vec3b(0, 0, 255); // Red for path
+        }
+    }
+
+    image.at<cv::Vec3b>(start.first, start.second) = cv::Vec3b(0, 255, 0); // Green for start
+    image.at<cv::Vec3b>(goal.first, goal.second) = cv::Vec3b(255, 0, 0); // Blue for goal
+
+    cv::resize(image, image, cv::Size(500, 500), 0, 0, cv::INTER_NEAREST);
+    cv::imshow("A* Pathfinding", image);
+    cv::waitKey(0);
+
+    return 0;
+}
