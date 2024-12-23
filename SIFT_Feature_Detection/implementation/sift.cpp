@@ -1,3 +1,8 @@
+//
+// Copyright(c) 2024 deepwave-ai. All Rights Reserved.
+//
+// sift.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include <iostream>

@@ -1,3 +1,9 @@
+//
+// Copyright(c) 2024 deepwave-ai. All Rights Reserved.
+//
+// sfit_slam.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
@@ -40,7 +46,15 @@ void findPose(const std::vector<cv::DMatch>& matches, const std::vector<cv::KeyP
 
 // Main Visual SLAM function
 void visualSLAM(const std::string& videoPath, const cv::Mat& K) {
-    cv::VideoCapture cap(videoPath == "0" ? 0 : videoPath);
+    cv::VideoCapture cap;
+
+    if (videoPath == "0") {
+        cap.open(0); // Open default camera
+    }
+    else {
+        cap.open(videoPath); // Open video file
+    }
+
     if (!cap.isOpened()) {
         std::cerr << "Error: Unable to open video." << std::endl;
         return;
@@ -103,7 +117,7 @@ int main() {
 
     // Path to video or live camera feed (use "0" for default camera)
     std::string videoPath = "0"; // Replace with your video path or "0" for live feed
-    
+
     visualSLAM(videoPath, K);
 
     return 0;
