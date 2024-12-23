@@ -2,7 +2,7 @@
 
 Overview
 
-Face Recognition With EKF Tracking can be used for
+Face Recognition With Particle Filter Tracking can be used for
 
 (1) Real-time face tracking in dynamic environments
 (2) Face-based motion estimation and state tracking
@@ -10,7 +10,7 @@ Face Recognition With EKF Tracking can be used for
 
 Implementation
 
-code implements a particle filter-based face tracking system with face recognition using OpenCV and dlib. Here's what it does:
+The code implements a particle filter-based face tracking system with face recognition using OpenCV and dlib. Here's what it does:
 
 1. Initialization:
 
