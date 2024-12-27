@@ -1,13 +1,52 @@
+//
+// Copyright(c) 2024 deepwave-ai. All Rights Reserved.
+//
+// faceEKFTracking.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
 #include <opencv2/opencv.hpp>
 #include <dlib/opencv.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing.h>
-#include <dlib/image_processing/shape_predictor.h>
-#include <dlib/image_processing/face_recognition.h>
+#include <dlib/dnn.h>
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <numeric>
+
+// Alias for dlib's face recognition model
+
+using namespace dlib;
+using namespace std;
+
+
+template <template <int, template<typename> class, int, typename> class block, int N, template<typename> class BN, typename SUBNET>
+using residual = dlib::add_prev1<block<N, BN, 1, dlib::tag1<SUBNET>>>;
+
+template <template <int, template<typename> class, int, typename> class block, int N, template<typename> class BN, typename SUBNET>
+using residual_down = dlib::add_prev2<dlib::avg_pool<2, 2, 2, 2, dlib::skip1<dlib::tag2<block<N, BN, 2, dlib::tag1<SUBNET>>>>>>;
+
+template <int N, template <typename> class BN, int stride, typename SUBNET>
+using block = BN<dlib::con<N, 3, 3, 1, 1, dlib::relu<BN<dlib::con<N, 3, 3, stride, stride, SUBNET>>>>>;
+
+template <int N, typename SUBNET> using ares = dlib::relu<residual<block, N, dlib::affine, SUBNET>>;
+template <int N, typename SUBNET> using ares_down = dlib::relu<residual_down<block, N, dlib::affine, SUBNET>>;
+
+template <typename SUBNET> using alevel0 = ares_down<256, SUBNET>;
+template <typename SUBNET> using alevel1 = ares<256, ares<256, ares_down<256, SUBNET>>>;
+template <typename SUBNET> using alevel2 = ares<128, ares<128, ares_down<128, SUBNET>>>;
+template <typename SUBNET> using alevel3 = ares<64, ares<64, ares<64, ares_down<64, SUBNET>>>>;
+template <typename SUBNET> using alevel4 = ares<32, ares<32, ares<32, SUBNET>>>;
+
+using anet_type = dlib::loss_metric<dlib::fc_no_bias<128, dlib::avg_pool_everything<
+    alevel0<
+    alevel1<
+    alevel2<
+    alevel3<
+    alevel4<
+    dlib::max_pool<3, 3, 2, 2, dlib::relu<dlib::affine<dlib::con<32, 7, 7, 2, 2,
+    dlib::input_rgb_image_sized<150> >>>>>>>>>>>>;
+
 
 // EKF Predict Step
 void predict(cv::Mat& state, cv::Mat& P, const cv::Mat& u, const cv::Mat& R) {
@@ -38,7 +77,7 @@ int main() {
     dlib::frontal_face_detector face_detector = dlib::get_frontal_face_detector();
     dlib::shape_predictor shape_predictor;
     dlib::deserialize("shape_predictor_68_face_landmarks.dat") >> shape_predictor;
-    dlib::anet_type face_recognizer;
+    anet_type face_recognizer;
     dlib::deserialize("dlib_face_recognition_resnet_model_v1.dat") >> face_recognizer;
 
     // Capture a reference face encoding
@@ -54,7 +93,11 @@ int main() {
 
         if (!faces.empty()) {
             dlib::full_object_detection shape = shape_predictor(dlib_frame, faces[0]);
-            known_face_encoding = face_recognizer.compute_face_descriptor(dlib_frame, shape);
+            // Align face and create a face chip
+            matrix<rgb_pixel> face_chip;
+            extract_image_chip(dlib_frame, get_face_chip_details(shape, 150, 0.25), face_chip);
+
+            known_face_encoding = face_recognizer(face_chip);
             reference_face_captured = true;
         }
 
@@ -65,7 +108,11 @@ int main() {
     // EKF initialization
     cv::Mat state = cv::Mat::zeros(3, 1, CV_64F); // [x, y, theta]
     cv::Mat P = cv::Mat::eye(3, 3, CV_64F) * 500;
-    cv::Mat R = cv::Mat::diag(cv::Matx31d(0.5, 0.5, cv::deg2rad(5.0)));
+
+    cv::Mat R = (cv::Mat_<double>(3, 3) << 0.5, 0, 0,
+        0, 0.5, 0,
+        0, 0, 5.0 * CV_PI / 180.0);
+
     cv::Mat Q = cv::Mat::eye(2, 2, CV_64F) * 2;
 
     while (true) {
@@ -84,14 +131,17 @@ int main() {
             cv::rectangle(frame, cv::Rect(x, y, w, h), cv::Scalar(255, 0, 0), 2);
 
             dlib::full_object_detection shape = shape_predictor(dlib_frame, face);
-            dlib::matrix<float, 0, 1> current_face_encoding = face_recognizer.compute_face_descriptor(dlib_frame, shape);
+            matrix<rgb_pixel> face_chip;
+            extract_image_chip(dlib_frame, get_face_chip_details(shape, 150, 0.25), face_chip);
+
+            dlib::matrix<float, 0, 1> current_face_encoding = face_recognizer(face_chip);
 
             double match_distance = dlib::length(current_face_encoding - known_face_encoding);
             if (match_distance < 0.6) {
                 cv::putText(frame, "Matched", cv::Point(x, y - 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1);
 
                 cv::Mat face_center = (cv::Mat_<double>(2, 1) << x + w / 2.0, y + h / 2.0);
-                
+
                 // EKF Predict and Update
                 cv::Mat u = cv::Mat::zeros(3, 1, CV_64F); // No control input
                 predict(state, P, u, R);
@@ -99,10 +149,12 @@ int main() {
                 update(state, P, face_center, H, Q);
 
                 std::string state_text = "State: x=" + std::to_string(state.at<double>(0)) + ", y=" +
-                                         std::to_string(state.at<double>(1)) + ", theta=" +
-                                         std::to_string(cv::degrees(state.at<double>(2)));
+                    std::to_string(state.at<double>(1)) + ", theta=" +
+                    std::to_string(state.at<double>(2) * 180.0 / CV_PI);
+
                 cv::putText(frame, state_text, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255), 1);
-            } else {
+            }
+            else {
                 cv::putText(frame, "Unknown", cv::Point(x, y - 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 255), 1);
             }
         }
