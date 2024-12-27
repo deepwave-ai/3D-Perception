@@ -162,8 +162,7 @@ Enable /bigobj in your project's C++ → Command Line settings.
 
 Issue 2: LNK2001: unresolved external symbol
 
-(1) Ensure consistent build configurations (e.g., Runtime Library settings). (2) Verify you are linking the correct .lib file (3) Add dlib_path\dlib\all\source.cpp from the dlib source directory to your project and re-compile it. Do not copy it to your project path, just add it from dlib source directory.
-
+(1) Ensure consistent build configurations (e.g., Runtime Library settings). (2) Verify you are linking the correct .lib file (3) Add dlib_path\dlib\all\source.cpp from the dlib source directory to your project and re-compile it.
 5.2 OpenCV Lib Linking
 
 Install opencv-4.10.0-windows.exe and add corresponding include, linker path and precompiled lib to your project.
