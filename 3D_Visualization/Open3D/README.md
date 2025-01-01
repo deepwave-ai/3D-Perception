@@ -98,3 +98,11 @@ Use Cases
 (1) A tool for teaching 3D data concepts.
 (2) Research in computer vision, graphics, and robotics.
 
+Demo
+
+The video demo can be found in the demo directory.
+
+<img width="779" alt="open3d_point_cloud" src="https://github.com/user-attachments/assets/b22a8132-9f2e-4521-a183-12a918fd2477" />
+
+
+
