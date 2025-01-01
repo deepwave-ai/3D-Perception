@@ -41,6 +41,7 @@ Key Functions:
 (3) add_mesh: Adds the sphere to the plot with red color and visible edges.
 
 (4) show: Displays the rendering.
+<img width="617" alt="sphere" src="https://github.com/user-attachments/assets/7f42785d-2d28-4417-918a-de195e5eeb04" />
 
 2. Creating and Plotting a Cylinder
 
@@ -53,6 +54,7 @@ Height = 2
 Axis aligned along the y-direction.
 
 Visualization: The cylinder is displayed in blue.
+<img width="608" alt="cylinder" src="https://github.com/user-attachments/assets/dab5077b-b0c8-43a0-a6c3-b5d060acd90b" />
 
 3. Boolean Operations Between a Sphere and a Cube
 
@@ -67,6 +69,7 @@ Steps:
 (3) Use boolean_difference to subtract the cube from the sphere.
 
 (4) Visualize the result in orange.
+<img width="520" alt="sphere_cube" src="https://github.com/user-attachments/assets/02ce10a6-0aa5-4b89-89ad-507c546f4a96" />
 
 4. Streamline Visualization in a Vector Field
 
@@ -81,6 +84,7 @@ Steps:
 (3) Use grid.streamlines to compute streamlines and seed points.
 
 (4) Visualize the streamlines and seed points.
+<img width="473" alt="vector_field" src="https://github.com/user-attachments/assets/6437857a-fb4b-4d2e-a3cd-4837aefdb1ed" />
 
 5. Point Cloud Visualization
 
@@ -91,6 +95,7 @@ Key Functions:
 (1) pv.PolyData: Creates a point cloud object.
 
 (2) add_mesh: Visualizes points as green spheres.
+<img width="595" alt="cloud_point_random" src="https://github.com/user-attachments/assets/c299d4b3-7253-4034-bba7-97bf63e7db1e" />
 
 6. Loading and Displaying a PLY File
 
@@ -105,6 +110,7 @@ Key Functions:
 7. Visualizing Scalars on a Structured Grid as a Volume
 
 Purpose: Visualizes scalar values on a structured grid as a 3D volume.
+<img width="464" alt="cloud_point_file" src="https://github.com/user-attachments/assets/bac6f9a4-ff80-4315-9f7b-9cb002343159" />
 
 Steps:
 
@@ -116,4 +122,4 @@ Steps:
 
 Summary
 
-This code showcases various 3D visualization techniques in PyVista, including creating and visualizing geometries (spheres, cylinders, cubes), performing Boolean operations, simulating streamlines, and working with structured grids and point clouds. It highlights PyVista’s ease of use for handling both geometry and data visualization tasks.
+This code showcases various 3D visualization techniques in PyVista, including creating and visualizing geometries (spheres, cylinders, cubes), performing Boolean operations, simulating streamlines, and working with structured grids and point clouds. It highlights PyVista’s ease of use for handling both geometry and data visualization tasks. The video demo files can be found in video_demo directory.
