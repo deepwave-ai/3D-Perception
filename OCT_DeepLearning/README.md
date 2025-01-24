@@ -142,11 +142,12 @@ Explainability: Grad-CAM provides insights into the model's decision-making proc
 Scalability: The pipeline can be extended to other medical imaging tasks or adapted to different architectures (e.g., VGG16, Inception).
 
 8. Results
-   ![Figure_1_3](https://github.com/user-attachments/assets/f35da282-c3fb-421b-b5c3-f470ae190ee2)
+   
+![Figure_1_6](https://github.com/user-attachments/assets/f4eb41b8-d271-4191-983f-4a12b92c36c8)
 
-   ![Figure_2_3](https://github.com/user-attachments/assets/1a00fd89-3c86-4cb2-984c-ec3cf1dd80cc)
+![Figure_2_6](https://github.com/user-attachments/assets/a0e05dae-9978-4214-a3fb-15b7edc13423)
 
-   ![Figure_3](https://github.com/user-attachments/assets/81cc3376-75e1-4169-85db-0d6af0a542c3)
+![Figure_3_6](https://github.com/user-attachments/assets/0d0ccfc7-e176-465f-a4b1-ded104393030)
 
 
 
